@@ -22,7 +22,7 @@ function varargout = biospin_frontend(varargin)
 
 % Edit the above text to modify the response to help biospin_frontend
 
-% Last Modified by GUIDE v2.5 21-Dec-2017 09:40:29
+% Last Modified by GUIDE v2.5 21-Dec-2017 16:24:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -93,7 +93,7 @@ imshow(get_file);
 
 
 % --- Executes on button press in Crop.
-function Crop_Callback(~, ~, handles)
+function Crop_Callback(hObject, eventdata, handles)
 % hObject    handle to Crop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -103,13 +103,10 @@ global get_file;
 % sebelum di crop
 pre_crop=get_file;
 
-global croped;
-croped=imcrop(pre_crop);
-
+global croped_var;
+croped_var=imcrop(pre_crop);
 % reserved
- axes(handles.croped)
- imshow(croped);
-
+ imshow(croped_var,'parent',handles.croped);
 
 
 % --- Executes on button press in Identify.
@@ -118,4 +115,31 @@ function Identify_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % prototype dynamic text
+
+% checking if object is null or not
+global croped_var;
+testing=isempty(croped_var);
+if (~testing)
+% put algorithm to identified picture
+elseif(testing)
+    uiwait(msgbox('Silahkan Lakukan Proses Crop Terlebih Dahulu!', 'Error','error'));    
+    return ;
+
+end
+
+
+
+
 % set(handles.Nama,'String',sprintf('Kampret'));
+
+
+% --- Executes on button press in reset.
+function reset_Callback(hObject, eventdata, handles)
+% hObject    handle to reset (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% clear all memory 
+clearvars -global
+cla (handles.after_process);
+cla (handles.croped);
+cla (handles.foto_mentah);
