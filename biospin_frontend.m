@@ -22,7 +22,7 @@ function varargout = biospin_frontend(varargin)
 
 % Edit the above text to modify the response to help biospin_frontend
 
-% Last Modified by GUIDE v2.5 21-Dec-2017 16:24:36
+% Last Modified by GUIDE v2.5 08-Jan-2018 14:05:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -121,6 +121,15 @@ global croped_var;
 testing=isempty(croped_var);
 if (~testing)
 % put algorithm to identified picture
+glcm=graycomatrix(croped_var);
+stats=graycoprops(glcm,'all');
+data_glcm=struct2array(stats);
+
+set(handles.contrast_text,'String',data_glcm(1));
+set(handles.correlation_text,'String',data_glcm(2));
+set(handles.energy_text,'String',data_glcm(3));
+set(handles.homogen_text,'String',data_glcm(4));
+
 elseif(testing)
     uiwait(msgbox('Silahkan Lakukan Proses Crop Terlebih Dahulu!', 'Error','error'));    
     return ;
@@ -140,6 +149,103 @@ function reset_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 % clear all memory 
 clearvars -global
-cla (handles.after_process);
-cla (handles.croped);
-cla (handles.foto_mentah);
+cla(handles.after_process);
+cla(handles.croped);
+cla(handles.foto_mentah);
+
+delete(handles.contrast_text);
+delete(handles.correlation_text);
+delete(handles.energy_text);
+delete(handles.homogen_text);
+
+
+
+function edit2_Callback(hObject, eventdata, handles)
+% hObject    handle to contrast_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of contrast_text as text
+%        str2double(get(hObject,'String')) returns contents of contrast_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function contrast_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to contrast_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit3_Callback(hObject, eventdata, handles)
+% hObject    handle to correlation_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of correlation_text as text
+%        str2double(get(hObject,'String')) returns contents of correlation_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function correlation_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to correlation_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit4_Callback(hObject, eventdata, handles)
+% hObject    handle to energy_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of energy_text as text
+%        str2double(get(hObject,'String')) returns contents of energy_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function energy_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to energy_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit5_Callback(hObject, eventdata, handles)
+% hObject    handle to homogen_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of homogen_text as text
+%        str2double(get(hObject,'String')) returns contents of homogen_text as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function homogen_text_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to homogen_text (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
