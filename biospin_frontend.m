@@ -22,7 +22,7 @@ function varargout = biospin_frontend(varargin)
 
 % Edit the above text to modify the response to help biospin_frontend
 
-% Last Modified by GUIDE v2.5 08-Jan-2018 14:05:14
+% Last Modified by GUIDE v2.5 18-Jan-2018 06:21:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -57,6 +57,7 @@ handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
+
 
 % UIWAIT makes biospin_frontend wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -121,15 +122,58 @@ global croped_var;
 testing=isempty(croped_var);
 if (~testing)
 % put algorithm to identified picture
+croped_var=imresize(croped_var,[64 64]);
+croped_var=imsharpen(croped_var,'Radius',1,'Amount',0.5);
+%(Wacana)tambahkan offset agar ke akuratan per pixel bertambah
 glcm=graycomatrix(croped_var);
+
 stats=graycoprops(glcm,'all');
 data_glcm=struct2array(stats);
 
+rata2=mean2(croped_var);
+std_deviation=std2(croped_var);
+glcm_entropy=entropy(croped_var);
+rata2_variance= mean2(var(double(croped_var)));
+glcm_kurtosis=kurtosis(double(croped_var(:)));
+glcm_skewness=skewness(double(croped_var(:)));
+glcm_contrast=data_glcm(1);
+glcm_correlation=data_glcm(2);
+glcm_energy=data_glcm(3);
+glcm_homogen=data_glcm(4);
+
+imshow(croped_var,'parent',handles.after_process);
 set(handles.contrast_text,'String',data_glcm(1));
 set(handles.correlation_text,'String',data_glcm(2));
 set(handles.energy_text,'String',data_glcm(3));
 set(handles.homogen_text,'String',data_glcm(4));
 
+buat_train=[glcm_contrast,glcm_correlation,glcm_energy,glcm_homogen,rata2,std_deviation,glcm_entropy,rata2_variance,glcm_kurtosis,glcm_skewness];
+test_data=buat_train;
+
+% mengambil data ekstraksi ciri
+load data_ekstraksi.mat
+
+%% WARNING THIS CODE IS NOT WORKING YET!
+
+%  paramater :multisvm( T,C,test ) 
+%  T=Training Matrix, C=Group, test=Testing matrix
+ hasil=multisvm(data_glcm,data_label,test_data);
+ 
+ switch hasil
+     case 1 
+        set(handles.Nama,'String',sprintf('Ahmad Alfi'));
+     case 2
+         set(handles.Nama,'String',sprintf('Dandi'));
+     case 3
+         set(handles.Nama,'String',sprintf('Farid'));
+     case 4
+         set(handles.Nama,'String',sprintf('Ika'));
+     case 5
+         set(handles.Nama,'String',sprintf('Rakha'));
+         
+ end
+
+%%STOP HERE
 elseif(testing)
     uiwait(msgbox('Silahkan Lakukan Proses Crop Terlebih Dahulu!', 'Error','error'));    
     return ;
@@ -153,10 +197,11 @@ cla(handles.after_process);
 cla(handles.croped);
 cla(handles.foto_mentah);
 
-delete(handles.contrast_text);
-delete(handles.correlation_text);
-delete(handles.energy_text);
-delete(handles.homogen_text);
+set(handles.contrast_text,'String',0);
+set(handles.correlation_text,'String',0);
+set(handles.energy_text,'String',0);
+set(handles.homogen_text,'String',0);
+set(handles.Nama,'String',sprintf(''));
 
 
 
@@ -249,3 +294,24 @@ function homogen_text_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in r_noise.
+function r_noise_Callback(hObject, eventdata, handles)
+% hObject    handle to r_noise (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global get_file;
+get_file=medfilt2(get_file);
+get_file=imsharpen(get_file,'Radius',1,'Amount',0.5);
+imshow(get_file);
+
+
+% --- Executes on button press in contrast_o.
+function contrast_o_Callback(hObject, eventdata, handles)
+% hObject    handle to contrast_o (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global get_file;
+get_file=imadjust(get_file,stretchlim(get_file));
+imshow(get_file);
