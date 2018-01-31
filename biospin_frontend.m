@@ -124,32 +124,54 @@ if (~testing)
 % put algorithm to identified picture
 croped_var=imresize(croped_var,[64 64]);
 croped_var=imsharpen(croped_var,'Radius',1,'Amount',0.5);
+offsets = [0 1; -1 1;-1 0;-1 -1;2 2];
 %(Wacana)tambahkan offset agar ke akuratan per pixel bertambah
-glcm=graycomatrix(croped_var);
+  glcm=graycomatrix(croped_var, 'Offset', offsets, 'Symmetric', true);
 
 stats=graycoprops(glcm,'all');
 data_glcm=struct2array(stats);
-
+iglcm=1;
+glcm_contrast={5};
+glcm_correlation={5};
+glcm_energy={5};
+glcm_homogeneity={5};
+    for x=1:5
+      glcm_contrast{x}=data_glcm(iglcm);
+      iglcm=iglcm+1;
+    end
+    for x=1:5
+        glcm_correlation{x}=data_glcm(iglcm);
+        iglcm=iglcm+1;
+    end
+    for x=1:5
+        glcm_energy{x}=data_glcm(iglcm);
+        iglcm=iglcm+1;
+    end
+    for x=1:5
+        glcm_homogeneity{x}=data_glcm(iglcm);
+        iglcm=iglcm+1;
+    end
 rata2=mean2(croped_var);
 std_deviation=std2(croped_var);
 glcm_entropy=entropy(croped_var);
-rata2_variance= mean2(var(double(croped_var)));
+% rata2_variance= mean2(var(double(croped_var)));
 glcm_kurtosis=kurtosis(double(croped_var(:)));
 glcm_skewness=skewness(double(croped_var(:)));
-glcm_contrast=data_glcm(1);
-glcm_correlation=data_glcm(2);
-glcm_energy=data_glcm(3);
-glcm_homogen=data_glcm(4);
+
+% glcm_contrast=data_glcm(1);
+% glcm_correlation=data_glcm(2);
+% glcm_energy=data_glcm(3);
+% glcm_homogen=data_glcm(4);
 
 imshow(croped_var,'parent',handles.after_process);
-set(handles.contrast_text,'String',data_glcm(1));
-set(handles.correlation_text,'String',data_glcm(2));
-set(handles.energy_text,'String',data_glcm(3));
-set(handles.homogen_text,'String',data_glcm(4));
+set(handles.contrast_text,'String',glcm_contrast{1});
+set(handles.correlation_text,'String',glcm_correlation(1));
+set(handles.energy_text,'String',glcm_energy(1));
+set(handles.homogen_text,'String',glcm_homogeneity(1));
 
-buat_train=[glcm_contrast,glcm_correlation,glcm_energy,glcm_homogen,rata2,std_deviation,glcm_entropy,rata2_variance,glcm_kurtosis,glcm_skewness];
-test_data=buat_train;
-
+buat_train=[glcm_contrast(1:5),glcm_correlation(1:5),glcm_energy(1:5),glcm_homogeneity(1:5),rata2,std_deviation,glcm_entropy,glcm_kurtosis,glcm_skewness];
+test_data=cell2mat(buat_train);
+save('hasil_coba.mat','buat_train');
 % mengambil data ekstraksi ciri
 load data_ekstraksi.mat
 
@@ -177,7 +199,6 @@ load data_ekstraksi.mat
 elseif(testing)
     uiwait(msgbox('Silahkan Lakukan Proses Crop Terlebih Dahulu!', 'Error','error'));    
     return ;
-
 end
 
 

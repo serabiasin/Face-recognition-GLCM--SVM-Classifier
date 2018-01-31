@@ -1,7 +1,7 @@
 [filename,pathname]=uigetfile({'*.jpg';'*.png'},'File Selector','Multiselect','on');
 
 %menambah sudut ekstraksi per pixel
-%  offsets = [0 1; -1 1;-1 0;-1 -1;2 2];
+  offsets = [0 1; -1 1;-1 0;-1 -1;2 2];
 
 total=length(filename);
 gambar={total};
@@ -18,23 +18,42 @@ for i=1:total
     gambar{i}=imread(file);
     gambar{i}=imresize(gambar{i},[64 64]);
     gambar{i}=rgb2gray(gambar{i});
+    
+    gambar{i}=imadjust(gambar{i},stretchlim(gambar{i} ));
     gambar{i}=imsharpen(gambar{i},'Radius',1,'Amount',0.5);
 
 %   glcm=graycomatrix(gambar{i},'Offset',offsets);
-    glcm=graycomatrix(gambar{i});
+    glcm=graycomatrix(gambar{i}, 'Offset', offsets, 'Symmetric', true);
     stats{i}=graycoprops(glcm);
     
-%     pengambilan data texture dan disimpan (sementara)
-        data_glcm{i,1}=stats{i}.Contrast;
-        data_glcm{i,2}=stats{i}.Correlation;
-        data_glcm{i,3}=stats{i}.Energy;        
-        data_glcm{i,4}=stats{i}.Homogeneity;
-        data_glcm{i,5}=mean2(gambar{i});
-        data_glcm{i,6}=std2(gambar{i});
-        data_glcm{i,7}=entropy(gambar{i});
-        data_glcm{i,8}= mean2(var(double(gambar{i}))); %rata-rata variance gambar
-        data_glcm{i,9}=kurtosis(double(gambar{i}(:)));
-        data_glcm{i,10}=skewness(double(gambar{i}(:)));
+%     pengambilan data texture dan disimpan (sementara) 
+
+iglcm=1;
+    for x=1:5
+      data_glcm{i,x}=stats{i}.Contrast(iglcm);
+      iglcm=iglcm+1;
+    end
+    iglcm=1;
+    for x=6:10
+        data_glcm{i,x}=stats{i}.Correlation(iglcm);
+        iglcm=iglcm+1;
+    end
+    iglcm=1;
+    for x=12:16
+        data_glcm{i,x}=stats{i}.Energy(iglcm);
+        iglcm=iglcm+1;
+    end
+        iglcm=1;
+    for x=18:22
+        data_glcm{i,x}=stats{i}.Homogeneity(iglcm);
+        iglcm=iglcm+1;
+    end
+        data_glcm{i,24}=mean2(gambar{i});
+        data_glcm{i,25}=std2(gambar{i});
+        data_glcm{i,26}=entropy(gambar{i});
+%         data_glcm{i,27}= mean2(var(double(gambar{i}))); %rata-rata variance gambar
+        data_glcm{i,28}=kurtosis(double(gambar{i}(:)));
+        data_glcm{i,29}=skewness(double(gambar{i}(:)));
         
         %pemberian label
         if i>limit
