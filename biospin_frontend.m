@@ -79,7 +79,7 @@ function Browse_picture_Callback(~, ~, handles)
 % hObject    handle to Browse_picture (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[Filename,Pathname]=uigetfile({'*.jpg';'*.png'},sprintf('Pilih sampel untuk scan'));
+[Filename,Pathname]=uigetfile({'*.pgm';'*.jpg';'*.png'},sprintf('Pilih sampel untuk scan'));
 % avoid error
 if Filename==0 
     return
@@ -122,8 +122,9 @@ global croped_var;
 testing=isempty(croped_var);
 if (~testing)
 % put algorithm to identified picture
-croped_var=imresize(croped_var,[64 64]);
-croped_var=imsharpen(croped_var,'Radius',1,'Amount',0.5);
+croped_var=imresize(croped_var,[32 32]);
+% croped_var=imadjust(croped_var,stretchlim(croped_var));
+% croped_var=imsharpen(croped_var,'Radius',1,'Amount',0.5);
 offsets = [0 1; -1 1;-1 0;-1 -1;2 2];
 %(Wacana)tambahkan offset agar ke akuratan per pixel bertambah
   glcm=graycomatrix(croped_var, 'Offset', offsets, 'Symmetric', true);
@@ -154,14 +155,9 @@ glcm_homogeneity={5};
 rata2=mean2(croped_var);
 std_deviation=std2(croped_var);
 glcm_entropy=entropy(croped_var);
-% rata2_variance= mean2(var(double(croped_var)));
+rata2_variance= mean2(var(double(croped_var)));
 glcm_kurtosis=kurtosis(double(croped_var(:)));
 glcm_skewness=skewness(double(croped_var(:)));
-
-% glcm_contrast=data_glcm(1);
-% glcm_correlation=data_glcm(2);
-% glcm_energy=data_glcm(3);
-% glcm_homogen=data_glcm(4);
 
 imshow(croped_var,'parent',handles.after_process);
 set(handles.contrast_text,'String',glcm_contrast{1});
@@ -169,9 +165,8 @@ set(handles.correlation_text,'String',glcm_correlation(1));
 set(handles.energy_text,'String',glcm_energy(1));
 set(handles.homogen_text,'String',glcm_homogeneity(1));
 
-buat_train=[glcm_contrast(1:5),glcm_correlation(1:5),glcm_energy(1:5),glcm_homogeneity(1:5),rata2,std_deviation,glcm_entropy,glcm_kurtosis,glcm_skewness];
+buat_train=[glcm_contrast(1:5),glcm_correlation(1:5),glcm_energy(1:5),glcm_homogeneity(1:5),rata2,std_deviation,glcm_entropy,rata2_variance,glcm_kurtosis,glcm_skewness];
 test_data=cell2mat(buat_train);
-save('hasil_coba.mat','buat_train');
 % mengambil data ekstraksi ciri
 load data_ekstraksi.mat
 
@@ -192,7 +187,9 @@ load data_ekstraksi.mat
          set(handles.Nama,'String',sprintf('Ika'));
      case 5
          set(handles.Nama,'String',sprintf('Rakha'));
-         
+    
+     otherwise
+         set(handles.Nama,'String',sprintf('ERROR'));
  end
 
 %%STOP HERE
@@ -324,7 +321,6 @@ function r_noise_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global get_file;
 get_file=medfilt2(get_file);
-get_file=imsharpen(get_file,'Radius',1,'Amount',0.5);
 imshow(get_file);
 
 

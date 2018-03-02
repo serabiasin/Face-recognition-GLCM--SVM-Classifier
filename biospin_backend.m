@@ -1,4 +1,4 @@
-[filename,pathname]=uigetfile({'*.jpg';'*.png'},'File Selector','Multiselect','on');
+[filename,pathname]=uigetfile({'*.jpg';'*.png';'*.pgm'},'File Selector','Multiselect','on');
 
 %menambah sudut ekstraksi per pixel
   offsets = [0 1; -1 1;-1 0;-1 -1;2 2];
@@ -16,13 +16,10 @@ for i=1:total
     
     file=fullfile(pathname,filename{i});
     gambar{i}=imread(file);
-    gambar{i}=imresize(gambar{i},[64 64]);
+    gambar{i}=imresize(gambar{i},[32 32]);
     gambar{i}=rgb2gray(gambar{i});
-    
-    gambar{i}=imadjust(gambar{i},stretchlim(gambar{i} ));
-    gambar{i}=imsharpen(gambar{i},'Radius',1,'Amount',0.5);
-
-%   glcm=graycomatrix(gambar{i},'Offset',offsets);
+%     gambar{i}=imadjust(gambar{i},stretchlim(gambar{i} ));
+%     gambar{i}=imsharpen(gambar{i},'Radius',1,'Amount',0.5);
     glcm=graycomatrix(gambar{i}, 'Offset', offsets, 'Symmetric', true);
     stats{i}=graycoprops(glcm);
     
@@ -51,7 +48,7 @@ iglcm=1;
         data_glcm{i,24}=mean2(gambar{i});
         data_glcm{i,25}=std2(gambar{i});
         data_glcm{i,26}=entropy(gambar{i});
-%         data_glcm{i,27}= mean2(var(double(gambar{i}))); %rata-rata variance gambar
+        data_glcm{i,27}= mean2(var(double(gambar{i}))); %rata-rata variance gambar
         data_glcm{i,28}=kurtosis(double(gambar{i}(:)));
         data_glcm{i,29}=skewness(double(gambar{i}(:)));
         
@@ -68,6 +65,3 @@ end
 data_glcm=cell2mat(data_glcm);
 data_label=cell2mat(data_label);
 save('data_ekstraksi.mat','data_glcm','data_label');
-% contoh penggunaan svm
-% SVMModel=fitcecoc(data_glcm,data_label);
-% test= fitcsvm(data_glcm,data_label,'Standardize',true,'KernelFunction','RBF','KernelScale','auto');
